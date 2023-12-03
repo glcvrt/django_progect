@@ -29,6 +29,12 @@ class Product(models.Model):
         # Строковое отображение объекта
         return f'{self.name}'
 
+    def price(self):
+        return f'{self.price_for_one} руб.'
+
+    def info(self):
+        return f'{self.description}'
+
     class Meta:
         verbose_name = 'продукт'  # Настройка для наименования одного объекта
         verbose_name_plural = 'продукты'
