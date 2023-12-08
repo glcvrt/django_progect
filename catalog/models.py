@@ -38,3 +38,21 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'продукт'  # Настройка для наименования одного объекта
         verbose_name_plural = 'продукты'
+
+
+class Blog(models.Model):
+    title = models.CharField(max_length=150, verbose_name='Заголовок')
+    slug = models.CharField(max_length=150, unique=True, verbose_name='Ссылка', **NULLABLE)
+    content = models.TextField(verbose_name='Содержимое', **NULLABLE)
+    image = models.ImageField(upload_to='blogs/', verbose_name='Изображение', **NULLABLE)
+    date_published = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации', **NULLABLE)
+    date_modified = models.DateTimeField(auto_now=True, verbose_name='Дата изменения', **NULLABLE)
+    is_published = models.BooleanField(default=True, verbose_name='Опубликовано', **NULLABLE)
+    views_count = models.IntegerField(default=0, verbose_name='Количество просмотров', **NULLABLE)
+
+    def __str__(self):
+        return f'{self.title}, {self.slug}'
+
+    class Meta:
+        verbose_name = 'статья'  # Настройка для наименования одного объекта
+        verbose_name_plural = 'статьи'
