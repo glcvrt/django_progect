@@ -44,7 +44,7 @@ class Blog(models.Model):
     title = models.CharField(max_length=150, verbose_name='Заголовок')
     slug = models.CharField(max_length=150, unique=True, verbose_name='Ссылка', **NULLABLE)
     content = models.TextField(verbose_name='Содержимое', **NULLABLE)
-    image = models.ImageField(upload_to='blogs/', verbose_name='Изображение', **NULLABLE)
+    image = models.ImageField(default='479679246.jpg', upload_to='blogs/', verbose_name='Изображение', **NULLABLE)
     date_published = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации', **NULLABLE)
     date_modified = models.DateTimeField(auto_now=True, verbose_name='Дата изменения', **NULLABLE)
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано', **NULLABLE)
