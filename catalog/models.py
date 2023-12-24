@@ -56,3 +56,17 @@ class Blog(models.Model):
     class Meta:
         verbose_name = 'статья'  # Настройка для наименования одного объекта
         verbose_name_plural = 'статьи'
+
+
+class Version(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='продукт')
+    title = models.CharField(max_length=100, verbose_name='название версии')
+    number = models.IntegerField(verbose_name='номер версии', **NULLABLE)
+    current_version = models.BooleanField(verbose_name='признак текущей версии')
+
+    def __str__(self):
+        return f'{self.title}'
+
+    class Meta:
+        verbose_name = 'версия'
+        verbose_name_plural = 'версии'
