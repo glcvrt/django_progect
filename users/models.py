@@ -3,7 +3,7 @@ import random
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from catalog.models import NULLABLE
+NULLABLE = {'blank': True, 'null': True}
 
 code = ''.join([str(random.randint(0, 9)) for _ in range(12)])
 
@@ -16,7 +16,6 @@ class User(AbstractUser):
     avatar = models.ImageField(verbose_name='аватар', upload_to='users/', **NULLABLE)
     phone_number = models.CharField(max_length=40, verbose_name='номер телефона', **NULLABLE)
     country = models.CharField(max_length=100, verbose_name='страна', **NULLABLE)
-    email_verified = models.BooleanField(default=False, verbose_name='Верификация почты')
     is_active = models.BooleanField(default=False, verbose_name='Активность')
     ver_code = models.CharField(max_length=15, default=code, verbose_name='Проверочный код')
 
