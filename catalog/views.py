@@ -1,10 +1,12 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.forms import inlineformset_factory
+from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.utils.text import slugify
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-from catalog.forms import ProductForm, VersionForm
+from catalog.forms import ProductForm, VersionForm, ProductModeratorForm
 from catalog.models import Product, Blog, Version
 
 
@@ -17,16 +19,28 @@ class ProductDetailView(DetailView):
     model = Product
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:products')
 
+    def form_valid(self, form):
+        if form.is_valid():
+            product = form.save()
+            product.user = self.request.user
+            product.save()
 
-class ProductUpdateView(UpdateView):
+        return super().form_valid(form)
+
+    def test_func(self):
+        return not self.request.user.is_staff
+
+
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:products')
+    permission_required = 'catalog.change_product'
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -46,10 +60,38 @@ class ProductUpdateView(UpdateView):
 
         return super().form_valid(form)
 
+    def get_form_class(self):
+        if self.request.user.is_staff:
+            return ProductModeratorForm
+        else:
+            return ProductForm
 
-class ProductDeleteView(DeleteView):
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.user != self.request.user and not self.request.user.is_staff:
+            raise Http404("Вы не являетесь владельцем этого товара")
+        return self.object
+
+    def test_func(self):
+        _user = self.request.user
+        _instance: Product = self.get_object()
+        custom_perms: tuple = (
+            'catalog_app.set_publication',
+            'catalog_app.set_category',
+            'catalog_app.set_description',
+        )
+
+        if _user == _instance.user:
+            return True
+        elif _user.groups.filter(name='moder') and _user.has_perms(custom_perms):
+            return True
+        return self.handle_no_permission()
+
+
+class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Product
     success_url = reverse_lazy('catalog:products')
+    permission_required = 'catalog.delete_product'
 
 
 def home_page(request):

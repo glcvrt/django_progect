@@ -28,6 +28,7 @@ class Product(models.Model):
     date_of_creation = models.DateTimeField(verbose_name='дата создания', **NULLABLE)
     last_modified_date = models.DateTimeField(verbose_name='дата последнего изменения', **NULLABLE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='пользователь', **NULLABLE)
+    publication = models.BooleanField(default=False, verbose_name="статус публикакции")
 
     def __str__(self):
         # Строковое отображение объекта
