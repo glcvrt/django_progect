@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.forms import inlineformset_factory
 from django.http import Http404
 from django.shortcuts import render
@@ -8,6 +8,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 
 from catalog.forms import ProductForm, VersionForm, ProductModeratorForm
 from catalog.models import Product, Blog, Version
+from catalog.servises import get_cached_categories
 
 
 class ProductsListView(ListView):
@@ -17,6 +18,7 @@ class ProductsListView(ListView):
 
 class ProductDetailView(DetailView):
     model = Product
+    permission_required = 'catalog.view_product'
 
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
@@ -35,8 +37,13 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     def test_func(self):
         return not self.request.user.is_staff
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data['category_list'] = get_cached_categories()
+        return context_data
 
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
+
+class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:products')
