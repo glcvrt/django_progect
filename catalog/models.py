@@ -43,6 +43,20 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'продукт'  # Настройка для наименования одного объекта
         verbose_name_plural = 'продукты'
+        permissions = [
+            (
+                'set_publication',
+                'Can change status publication'
+            ),
+            (
+                'set_category',
+                'Can change category'
+            ),
+            (
+                'set_description',
+                'Can change description'
+            )
+        ]
 
 
 class Blog(models.Model):
